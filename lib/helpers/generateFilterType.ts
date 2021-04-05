@@ -1,6 +1,7 @@
 import { Field, InputType } from "type-graphql";
 import { getMetadataStorage as getTypeGraphQLMetadataStorage } from "type-graphql/dist/metadata/getMetadataStorage";
 
+import { getFilterTypeStorage } from "../types/getFilterTypeStorage";
 import { getMetadataStorage } from "../metadata/getMetadataStorage";
 import { ARRAY_RETURN_TYPE_OPERATORS, LOGICAL_RETURN_TYPE_OPERATORS } from "../types";
 
@@ -14,6 +15,11 @@ import { ARRAY_RETURN_TYPE_OPERATORS, LOGICAL_RETURN_TYPE_OPERATORS } from "../t
  * @param type
  */
 export const generateFilterType = (type: Function) => {
+  const filterTypeStorage = getFilterTypeStorage();
+  if (filterTypeStorage.has(type)) {
+    return filterTypeStorage.get(type);
+  }
+
   const metadataStorage = getMetadataStorage();
   const filtersData = metadataStorage.filters.filter((f) => f.target === type);
 
@@ -105,5 +111,7 @@ export const generateFilterType = (type: Function) => {
   }
 
   const filterTypeName = graphQLModel.name + "Filter";
-  return () => filterTypeContainer[filterTypeName];
+
+  filterTypeStorage.set(type, filterTypeContainer[filterTypeName]);
+  return filterTypeContainer[filterTypeName];
 };
