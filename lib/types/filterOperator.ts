@@ -1,14 +1,18 @@
 export type FilterOperator =
-  | "lt"
-  | "gt"
-  | "lte"
-  | "gte"
   | "eq"
-  | "ne"
+  | "gt"
+  | "gte"
   | "in"
+  | "lt"
+  | "ne"
+  | "nin"
   | "like"
-  | "likeAny"
-  | "exist";
+  | "re"
+  | "ilike"
+  | "overlap"
+  | "contains"
+  | "contained"
+  ;
 
 export type LogicalOperator =
   | "and"
@@ -17,4 +21,4 @@ export type LogicalOperator =
 
 export const LOGICAL_RETURN_TYPE_OPERATORS: LogicalOperator[] = ["and", "or", "not"];
 
-export const ARRAY_RETURN_TYPE_OPERATORS: (LogicalOperator|FilterOperator)[] = ["and", "or", "in", "likeAny"];
+export const ARRAY_RETURN_TYPE_OPERATORS: (LogicalOperator|FilterOperator)[] = ["and", "or", "in"];
