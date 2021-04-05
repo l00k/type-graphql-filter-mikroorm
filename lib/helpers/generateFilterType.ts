@@ -17,7 +17,7 @@ import { ARRAY_RETURN_TYPE_OPERATORS, LOGICAL_RETURN_TYPE_OPERATORS } from "../t
 export const generateFilterType = (type: Function) => {
   const filterTypeStorage = getFilterTypeStorage();
   if (filterTypeStorage.has(type)) {
-    return filterTypeStorage.get(type);
+    return () => filterTypeStorage.get(type);
   }
 
   const metadataStorage = getMetadataStorage();
@@ -113,5 +113,5 @@ export const generateFilterType = (type: Function) => {
   const filterTypeName = graphQLModel.name + "Filter";
 
   filterTypeStorage.set(type, filterTypeContainer[filterTypeName]);
-  return filterTypeContainer[filterTypeName];
+  return () => filterTypeContainer[filterTypeName];
 };
