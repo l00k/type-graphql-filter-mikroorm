@@ -1,5 +1,10 @@
 import { Filter } from "./decorators";
-import { generateFilterType } from "./helpers";
-import { BaseOperator, FilterOperator } from "./types";
+import { generateFilterType, parseMikroOrmFilters } from "./helpers";
+import { FilterOperator } from "./types";
 
-export { BaseOperator, FilterOperator, Filter, generateFilterType };
+export {
+    FilterOperator,
+    Filter,
+    generateFilterType,
+    parseMikroOrmFilters
+};

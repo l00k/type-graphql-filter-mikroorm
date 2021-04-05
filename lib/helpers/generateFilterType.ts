@@ -2,7 +2,7 @@ import { Field, InputType } from "type-graphql";
 import { getMetadataStorage as getTypeGraphQLMetadataStorage } from "type-graphql/dist/metadata/getMetadataStorage";
 
 import { getMetadataStorage } from "../metadata/getMetadataStorage";
-import { ARRAY_RETURN_TYPE_OPERATORS, BaseOperator } from "../types";
+import { ARRAY_RETURN_TYPE_OPERATORS, LOGICAL_RETURN_TYPE_OPERATORS } from "../types";
 
 /**
  * Generate a type-graphql InputType from a @ObjectType decorated
@@ -47,36 +47,63 @@ export const generateFilterType = (type: Function) => {
 
     const fieldName = graphQLField ? graphQLField.schemaName : field;
 
-    Field(() => BaseOperator, { nullable: true })(
+    // Field operators wrapper @InputType
+    const fieldConditionTypeName = graphQLModel.name + '_' + fieldName.toString() + "Condition";
+    conditionTypeContainer[fieldConditionTypeName] = class {};
+
+    InputType(fieldConditionTypeName)(conditionTypeContainer[fieldConditionTypeName]);
+
+    // Assign operator wrapper to field
+    Field(() => conditionTypeContainer[fieldConditionTypeName], { nullable: true })(
       conditionTypeContainer[conditionTypeName].prototype,
-      "operator",
+      field,
     );
 
     for (const operator of operators) {
-      const baseReturnType =
-        typeof getReturnType === "function" ? getReturnType() : String;
+      const baseReturnType = LOGICAL_RETURN_TYPE_OPERATORS.includes(<any>operator)
+        ? conditionTypeContainer[fieldConditionTypeName]
+        : typeof getReturnType === "function"
+          ? getReturnType()
+          : String;
+
       const returnTypeFunction = ARRAY_RETURN_TYPE_OPERATORS.includes(operator)
         ? () => [baseReturnType]
         : () => baseReturnType;
 
       Field(returnTypeFunction, { nullable: true })(
-        conditionTypeContainer[conditionTypeName].prototype,
-        `${String(fieldName)}_${operator}`,
+        conditionTypeContainer[fieldConditionTypeName].prototype,
+        operator,
       );
     }
   }
 
+  // Add logical operators
+  for (const operator of LOGICAL_RETURN_TYPE_OPERATORS) {
+    const returnTypeFunction = ARRAY_RETURN_TYPE_OPERATORS.includes(operator)
+      ? () => [conditionTypeContainer[conditionTypeName]]
+      : () => conditionTypeContainer[conditionTypeName];
+
+    Field(returnTypeFunction, { nullable: true })(
+      conditionTypeContainer[conditionTypeName].prototype,
+      operator,
+    );
+  }
+
   // Extend the Condition type to create the final Filter type
+  const filterTypeContainer : any = {};
+
+  for (const className in conditionTypeContainer) {
+    const filterTypeName : string = className.replace(/Condition$/, '') + "Filter";
+    filterTypeContainer[filterTypeName] = class extends conditionTypeContainer[className] {};
+
+    InputType(filterTypeName)(filterTypeContainer[filterTypeName]);
+
+    Field(() => [conditionTypeContainer[className]], { nullable: true, })(
+      filterTypeContainer[filterTypeName].prototype,
+      "conditions"
+    );
+  }
+
   const filterTypeName = graphQLModel.name + "Filter";
-  const filterTypeContainer = {
-    [filterTypeName]: class extends conditionTypeContainer[conditionTypeName] {},
-  };
-
-  InputType()(filterTypeContainer[filterTypeName]);
-
-  Field(() => [conditionTypeContainer[conditionTypeName]], {
-    nullable: true,
-  })(filterTypeContainer[filterTypeName].prototype, "conditions");
-
   return () => filterTypeContainer[filterTypeName];
 };

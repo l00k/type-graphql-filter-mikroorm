@@ -10,4 +10,11 @@ export type FilterOperator =
   | "likeAny"
   | "exist";
 
-export const ARRAY_RETURN_TYPE_OPERATORS: FilterOperator[] = ["in", "likeAny"];
+export type LogicalOperator =
+  | "and"
+  | "or"
+  | "not"
+
+export const LOGICAL_RETURN_TYPE_OPERATORS: LogicalOperator[] = ["and", "or", "not"];
+
+export const ARRAY_RETURN_TYPE_OPERATORS: (LogicalOperator|FilterOperator)[] = ["and", "or", "in", "likeAny"];

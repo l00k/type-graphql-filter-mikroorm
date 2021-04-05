@@ -1,10 +1,10 @@
 {
-  "name": "type-graphql-filter",
+  "name": "type-graphql-filter-mikroorm",
   "version": "0.2.3",
-  "description": "Filter decorator for type-graphql",
+  "description": "Filter decorator for type-graphql and MikroORM",
   "main": "dist/lib/index.js",
   "types": "dist/lib/index.d.ts",
-  "repository": "https://github.com/kontist/type-graphql-filter.git",
+  "repository": "https://github.com/l00k/type-graphql-filter-mikroorm.git",
   "author": "Kontist GmbH",
   "license": "Apache-2.0",
   "scripts": {
