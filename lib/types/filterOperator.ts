@@ -4,6 +4,7 @@ export type FilterOperator =
   | "gte"
   | "in"
   | "lt"
+  | "lte"
   | "ne"
   | "nin"
   | "like"
