@@ -1,8 +1,10 @@
+import { FILTER_OPERATORS } from '../types';
+
+
 export function parseMikroOrmFilters(source : any) {
     const parsed : any = {};
-    const keywords = [ 'and', 'or', 'not', 'eq' ];
     for (const key in source) {
-        const tKey = keywords.includes(key)
+        const tKey = FILTER_OPERATORS.includes(key)
             ? '$' + key
             : key;
 
