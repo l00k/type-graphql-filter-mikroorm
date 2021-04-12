@@ -1,9 +1,14 @@
 import { FILTER_OPERATORS } from '../types';
 
 
-export function parseMikroOrmFilters(source : any) {
+export function parseMikroOrmFilters(source : any)
+{
     const parsed : any = {};
     for (const key in source) {
+        if (!source.hasOwnProperty(key)) {
+            continue;
+        }
+
         const tKey = FILTER_OPERATORS.includes(key)
             ? '$' + key
             : key;

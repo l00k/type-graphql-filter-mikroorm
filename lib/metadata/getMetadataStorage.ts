@@ -1,9 +1,12 @@
-import { MetadataStorage } from "../types";
+import { MetadataStorage } from '../types';
 
-const metadataStorage = {
-  filters: [],
+
+const metadataStorage : MetadataStorage = {
+    filters: [],
+    filtersChilds: [],
 };
 
-export function getMetadataStorage(): MetadataStorage {
-  return metadataStorage;
+export function getMetadataStorage() : MetadataStorage
+{
+    return metadataStorage;
 }

@@ -1,6 +1,6 @@
 {
   "name": "@100k/type-graphql-filter-mikroorm",
-  "version": "0.0.9",
+  "version": "0.1.1",
   "description": "Filter decorator for type-graphql and MikroORM",
   "main": "dist/lib/index.js",
   "types": "dist/lib/index.d.ts",
@@ -9,7 +9,7 @@
   "license": "Apache-2.0",
   "scripts": {
     "build": "tsc",
-    "test": "npm run lint && npm run build && ./node_modules/mocha/bin/mocha --recursive 'dist/tests/**/*.spec.js'",
+    "test": "npm run build && ./node_modules/mocha/bin/mocha --recursive 'dist/tests/**/*.spec.js'",
     "cover": "nyc npm run test",
     "lint": "./node_modules/tslint/bin/tslint --fix --project ."
   },

@@ -1,10 +1,13 @@
-import { Filter } from "./decorators";
-import { generateFilterType, parseMikroOrmFilters } from "./helpers";
-import { FilterOperator } from "./types";
+import 'reflect-metadata';
+import { Filter } from './decorators';
+import { generateFilterType, generatePaginationType, parseMikroOrmFilters } from './helpers';
+import { Pagination } from './types';
+
 
 export {
-    FilterOperator,
     Filter,
+    Pagination,
     generateFilterType,
+    generatePaginationType,
     parseMikroOrmFilters
 };

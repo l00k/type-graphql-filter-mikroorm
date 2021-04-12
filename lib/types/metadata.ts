@@ -1,16 +1,24 @@
-import { GraphQLScalarType } from "graphql";
+import { GraphQLScalarType } from 'graphql';
 
-import { FilterOperator } from ".";
+import { FilterOperator } from '.';
 
-export type ReturnTypeFunc = (type?: void) => GraphQLScalarType | Function;
+
+export type ReturnTypeFunc = (type? : void) => GraphQLScalarType | Function;
 
 export type FiltersCollectionType = {
-  target: Function;
-  field: string | symbol;
-  operators: FilterOperator[];
-  getReturnType?: ReturnTypeFunc;
+    target : Function;
+    field : string | symbol;
+    operators : FilterOperator[];
+    getReturnType? : ReturnTypeFunc;
+};
+
+export type FilterChildsCollectionType = {
+    target : Function;
+    field : string | symbol;
+    getReturnType : ReturnTypeFunc;
 };
 
 export type MetadataStorage = {
-  filters: FiltersCollectionType[];
+    filters : FiltersCollectionType[];
+    filtersChilds : FilterChildsCollectionType[];
 };

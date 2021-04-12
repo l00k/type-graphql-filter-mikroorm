@@ -1,1 +1,1 @@
-export * from "./getMetadataStorage";
+export * from './getMetadataStorage';
