@@ -27,7 +27,7 @@ describe('generateFilterType', () => {
             amount : number;
 
             @Field(type => FilterableSubObjectType)
-            @FilterChilds()
+            @FilterChilds(type => FilterableSubObjectType)
             child : FilterableSubObjectType;
 
             @Field(type => String, { name: 'purpose' })
@@ -60,10 +60,10 @@ describe('generateFilterType', () => {
         schemaIntrospection = (result as any).data.__schema as IntrospectionSchema;
     });
 
-    const assertFilterFields = (objectName : string, objectType : string) => {
+    const assertFilterFields = (objectName : string) => {
         const amountConditionType = schemaIntrospection.types
-            .find(type => type.name === `${ objectName }_amount_${ objectType }`) as IntrospectionInputObjectType;
-        expect(amountConditionType.name).toEqual(`${ objectName }_amount_${ objectType }`);
+            .find(type => type.name === `${ objectName }_amount_Condition`) as IntrospectionInputObjectType;
+        expect(amountConditionType.name).toEqual(`${ objectName }_amount_Condition`);
         expect(amountConditionType.kind).toEqual(TypeKind.INPUT_OBJECT);
 
         const amountLtType = amountConditionType.inputFields.find(field => field.name === 'lt')?.type as IntrospectionInputObjectType;
@@ -75,8 +75,8 @@ describe('generateFilterType', () => {
         expect(amountGtType.kind).toEqual(TypeKind.SCALAR);
 
         const purposeConditionType = schemaIntrospection.types
-            .find(type => type.name === `${ objectName }_purpose_${ objectType }`) as IntrospectionInputObjectType;
-        expect(purposeConditionType.name).toEqual(`${ objectName }_purpose_${ objectType }`);
+            .find(type => type.name === `${ objectName }_purpose_Condition`) as IntrospectionInputObjectType;
+        expect(purposeConditionType.name).toEqual(`${ objectName }_purpose_Condition`);
         expect(purposeConditionType.kind).toEqual(TypeKind.INPUT_OBJECT);
 
         const purposeLikeType = purposeConditionType.inputFields.find(field => field.name === 'like')?.type as IntrospectionInputObjectType;
@@ -88,16 +88,11 @@ describe('generateFilterType', () => {
         expect(purposeEqType.kind).toEqual(TypeKind.SCALAR);
     };
 
-    it('should generate a proper condition type', () => {
-        const conditionType = schemaIntrospection.types.find(type => type.name === 'SomeName_Condition') as IntrospectionInputObjectType;
-        expect(conditionType.inputFields.length).toEqual(6);
-
-        assertFilterFields('SomeName', 'Condition');
-    });
-
     it('should generate a proper filter type', () => {
-        const filterType = schemaIntrospection.types.find(type => type.name === 'SomeName_Filter') as IntrospectionInputObjectType;
+        const filterType = schemaIntrospection.types.find(type => type.name === 'SomeNameFilter') as IntrospectionInputObjectType;
 
         expect(filterType.inputFields.length).toEqual(6);
+
+        assertFilterFields('SomeName');
     });
 });

@@ -1,18 +1,18 @@
-import { generateFilterType } from '../helpers';
 import { getMetadataStorage } from '../metadata';
+import { ReturnTypeFunc } from '../types';
 
 
-export function FilterChilds() : PropertyDecorator
+export function FilterChilds(getReturnType : ReturnTypeFunc) : PropertyDecorator
 {
     return (prototype, field : string | symbol) => {
         const metadataStorage = getMetadataStorage();
 
-        const type = Reflect.getMetadata('design:type', prototype, field);
+        console.log(prototype.constructor, field, getReturnType());
 
         metadataStorage.filtersChilds.push({
             target: prototype.constructor,
             field,
-            getReturnType: generateFilterType(type)
+            getReturnType
         });
     };
 }

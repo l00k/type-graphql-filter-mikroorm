@@ -1,4 +1,7 @@
-import { getFilterTypeStorage } from '../types/getFilterTypeStorage';
+import * as GraphQL from 'type-graphql';
+import * as ClassValidator from 'class-validator';
+import { getMetadataStorage as getTypeGraphQLMetadataStorage } from 'type-graphql/dist/metadata/getMetadataStorage';
+import { getPaginationTypeStorage } from '../types';
 
 
 /**
@@ -14,8 +17,52 @@ export const generatePaginationType = (
     type : Function,
     itemsPerPageOptions : number[]
 ) => {
-    const filterTypeStorage = getFilterTypeStorage();
-    if (filterTypeStorage.has(type)) {
-        return () => filterTypeStorage.get(type);
+    // get cached result
+    const paginationTypeStorage = getPaginationTypeStorage();
+    if (paginationTypeStorage.has(type)) {
+        return () => paginationTypeStorage.get(type) as ReturnType<any>;
     }
+
+    // get storage
+    const typeGraphQLMetadata = getTypeGraphQLMetadataStorage();
+
+    // get target model
+    const objectTypesList = typeGraphQLMetadata.objectTypes;
+    const graphQLModel = objectTypesList.find((ot) => ot.target === type);
+
+    if (!graphQLModel) {
+        throw new Error(`Please decorate your class "${ type }" with @ObjectType if you want to filter it`);
+    }
+
+    // Create a new empty class with the "<graphQLModel.name>Pagination" name
+    const paginationTypeName = graphQLModel.name + 'Pagination';
+    const typeContainer = {
+        [paginationTypeName]: class {},
+    };
+
+    // Call the @InputType decorator on that class
+    GraphQL.InputType(paginationTypeName)(typeContainer[paginationTypeName]);
+
+    // Simulate creation of fields for this class/InputType by calling @Field()
+    GraphQL.Field(() => Number)(
+        typeContainer[paginationTypeName].prototype,
+        'page',
+    );
+    ClassValidator.Min(1)(
+        typeContainer[paginationTypeName].prototype,
+        'page',
+    );
+
+    GraphQL.Field(() => Number)(
+        typeContainer[paginationTypeName].prototype,
+        'itemsPerPage',
+    );
+    ClassValidator.IsIn(itemsPerPageOptions)(
+        typeContainer[paginationTypeName].prototype,
+        'itemsPerPage',
+    );
+
+    paginationTypeStorage.set(type, typeContainer[paginationTypeName]);
+
+    return () => typeContainer[paginationTypeName] as ReturnType<any>;
 };

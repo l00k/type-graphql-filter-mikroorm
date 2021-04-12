@@ -1,9 +1,7 @@
-import { Field, InputType } from 'type-graphql';
+import * as GraphQL from 'type-graphql';
 import { getMetadataStorage as getTypeGraphQLMetadataStorage } from 'type-graphql/dist/metadata/getMetadataStorage';
 import { getMetadataStorage } from '../metadata/getMetadataStorage';
-import { ARRAY_RETURN_TYPE_OPERATORS, LOGICAL_RETURN_TYPE_OPERATORS, ReturnTypeFunc } from '../types';
-
-import { getFilterTypeStorage } from '../types/getFilterTypeStorage';
+import { ARRAY_RETURN_TYPE_OPERATORS, LOGICAL_RETURN_TYPE_OPERATORS, ReturnTypeFunc, getFilterTypeStorage } from '../types';
 
 
 /**
@@ -13,9 +11,7 @@ import { getFilterTypeStorage } from '../types/getFilterTypeStorage';
  * This should be used to generate the type of the @Arg
  * decorator on the corresponding resolver.
  */
-export function generateFilterType(
-    type : Function
-) : ReturnTypeFunc
+export function generateFilterType(type : Function) : ReturnTypeFunc
 {
     // get cached result
     const filterTypeStorage = getFilterTypeStorage();
@@ -25,7 +21,6 @@ export function generateFilterType(
 
     // get storage
     const metadataStorage = getMetadataStorage();
-
     const typeGraphQLMetadata = getTypeGraphQLMetadataStorage();
 
     // get target model
@@ -33,17 +28,17 @@ export function generateFilterType(
     const graphQLModel = objectTypesList.find((ot) => ot.target === type);
 
     if (!graphQLModel) {
-        throw new Error(`Please decorate your class "${ type }" with @ObjectType if you want to filter it`,);
+        throw new Error(`Please decorate your class "${ type }" with @ObjectType if you want to filter it`);
     }
 
-    // Create a new empty class with the "<graphQLModel.name>_Condition" name
-    const conditionTypeName = graphQLModel.name + '_Condition';
+    // Create a new empty class with the "<graphQLModel.name>Filter" name
+    const conditionTypeName = graphQLModel.name + 'Filter';
     const typeContainer = {
         [conditionTypeName]: class {},
     };
 
     // Call the @InputType decorator on that class
-    InputType(conditionTypeName)(typeContainer[conditionTypeName]);
+    GraphQL.InputType(conditionTypeName)(typeContainer[conditionTypeName]);
 
     // Simulate creation of fields for this class/InputType by calling @Field()
     const filtersData = metadataStorage.filters.filter((f) => f.target === type);
@@ -57,16 +52,16 @@ export function generateFilterType(
         const fieldConditionTypeName = graphQLModel.name + '_' + fieldName.toString() + '_Condition';
         typeContainer[fieldConditionTypeName] = class {};
 
-        InputType(fieldConditionTypeName)(typeContainer[fieldConditionTypeName]);
+        GraphQL.InputType(fieldConditionTypeName)(typeContainer[fieldConditionTypeName]);
 
         // Assign operator wrapper to field
-        Field(() => typeContainer[fieldConditionTypeName], { nullable: true })(
+        GraphQL.Field(() => typeContainer[fieldConditionTypeName], { nullable: true })(
             typeContainer[conditionTypeName].prototype,
             field,
         );
 
         for (const operator of operators) {
-            const baseReturnType = LOGICAL_RETURN_TYPE_OPERATORS.includes(operator as any)
+            const baseReturnType = LOGICAL_RETURN_TYPE_OPERATORS.includes(operator)
                 ? typeContainer[fieldConditionTypeName]
                 : typeof getReturnType === 'function'
                     ? getReturnType()
@@ -76,7 +71,7 @@ export function generateFilterType(
                 ? () => [ baseReturnType ]
                 : () => baseReturnType;
 
-            Field(returnTypeFunction, { nullable: true })(
+            GraphQL.Field(returnTypeFunction, { nullable: true })(
                 typeContainer[fieldConditionTypeName].prototype,
                 operator,
             );
@@ -86,7 +81,8 @@ export function generateFilterType(
     // Simulate creation of fields for this class/InputType by calling @Field()
     const filtersChildsData = metadataStorage.filtersChilds.filter((f) => f.target === type);
     for (const { field, getReturnType } of filtersChildsData) {
-        Field(getReturnType, { nullable: true })(
+        const type = generateFilterType(<Function> getReturnType());
+        GraphQL.Field(type, { nullable: true })(
             typeContainer[conditionTypeName].prototype,
             field,
         );
@@ -98,7 +94,7 @@ export function generateFilterType(
             ? () => [ typeContainer[conditionTypeName] ]
             : () => typeContainer[conditionTypeName];
 
-        Field(returnTypeFunction, { nullable: true })(
+        GraphQL.Field(returnTypeFunction, { nullable: true })(
             typeContainer[conditionTypeName].prototype,
             operator,
         );
@@ -107,9 +103,5 @@ export function generateFilterType(
     filterTypeStorage.set(type, typeContainer[conditionTypeName]);
 
     // define final object type
-    const filterTypeName : string = conditionTypeName.replace(/_Condition$/, '_Filter');
-    typeContainer[filterTypeName] = class extends typeContainer[conditionTypeName] {};
-    InputType(filterTypeName)(typeContainer[filterTypeName]);
-
-    return () => typeContainer[filterTypeName] as ReturnType<any>;
+    return () => typeContainer[conditionTypeName] as ReturnType<any>;
 };
