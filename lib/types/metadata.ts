@@ -12,7 +12,7 @@ export type FiltersCollectionType = {
     getReturnType? : ReturnTypeFunc;
 };
 
-export type FilterChildsCollectionType = {
+export type DeepFiltersCollectionType = {
     target : Function;
     field : string | symbol;
     getReturnType : ReturnTypeFunc;
@@ -20,5 +20,5 @@ export type FilterChildsCollectionType = {
 
 export type MetadataStorage = {
     filters : FiltersCollectionType[];
-    filtersChilds : FilterChildsCollectionType[];
+    filtersChilds : DeepFiltersCollectionType[];
 };

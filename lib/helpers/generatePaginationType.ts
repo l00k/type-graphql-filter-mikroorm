@@ -44,23 +44,13 @@ export const generatePaginationType = (
     GraphQL.InputType(paginationTypeName)(typeContainer[paginationTypeName]);
 
     // Simulate creation of fields for this class/InputType by calling @Field()
-    GraphQL.Field(() => Number)(
-        typeContainer[paginationTypeName].prototype,
-        'page',
-    );
-    ClassValidator.Min(1)(
-        typeContainer[paginationTypeName].prototype,
-        'page',
-    );
+    const prototype = typeContainer[paginationTypeName].prototype;
 
-    GraphQL.Field(() => Number)(
-        typeContainer[paginationTypeName].prototype,
-        'itemsPerPage',
-    );
-    ClassValidator.IsIn(itemsPerPageOptions)(
-        typeContainer[paginationTypeName].prototype,
-        'itemsPerPage',
-    );
+    GraphQL.Field(() => Number)(prototype, 'page');
+    ClassValidator.Min(1)(prototype, 'page');
+
+    GraphQL.Field(() => Number)(prototype, 'itemsPerPage');
+    ClassValidator.IsIn(itemsPerPageOptions)(prototype, 'itemsPerPage');
 
     paginationTypeStorage.set(type, typeContainer[paginationTypeName]);
 

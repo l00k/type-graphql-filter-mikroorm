@@ -2,7 +2,7 @@ import expect from 'expect';
 
 import { IntrospectionInputObjectType, graphql, getIntrospectionQuery, IntrospectionSchema, TypeKind } from 'graphql';
 import { Field, Resolver, Query, buildSchema, ObjectType, Int, Arg } from 'type-graphql';
-import { Filter, FilterChilds } from '../../lib/decorators';
+import { Filter, DeepFilter } from '../../lib/decorators';
 import { generateFilterType } from '../../lib/helpers';
 
 
@@ -27,7 +27,7 @@ describe('generateFilterType', () => {
             amount : number;
 
             @Field(type => FilterableSubObjectType)
-            @FilterChilds(type => FilterableSubObjectType)
+            @DeepFilter(type => FilterableSubObjectType)
             child : FilterableSubObjectType;
 
             @Field(type => String, { name: 'purpose' })

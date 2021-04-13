@@ -12,6 +12,7 @@ import { ARRAY_RETURN_TYPE_OPERATORS, LOGICAL_RETURN_TYPE_OPERATORS, ReturnTypeF
  * decorator on the corresponding resolver.
  */
 export function generateFilterType(type : Function) : ReturnTypeFunc
+export function generateFilterType(type : Function) : ReturnTypeFunc
 {
     // get cached result
     const filterTypeStorage = getFilterTypeStorage();
