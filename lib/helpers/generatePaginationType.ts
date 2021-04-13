@@ -46,10 +46,10 @@ export const generatePaginationType = (
     // Simulate creation of fields for this class/InputType by calling @Field()
     const prototype = typeContainer[paginationTypeName].prototype;
 
-    GraphQL.Field(() => Number)(prototype, 'page');
+    GraphQL.Field(() => GraphQL.Int)(prototype, 'page');
     ClassValidator.Min(1)(prototype, 'page');
 
-    GraphQL.Field(() => Number)(prototype, 'itemsPerPage');
+    GraphQL.Field(() => GraphQL.Int)(prototype, 'itemsPerPage');
     ClassValidator.IsIn(itemsPerPageOptions)(prototype, 'itemsPerPage');
 
     paginationTypeStorage.set(type, typeContainer[paginationTypeName]);
