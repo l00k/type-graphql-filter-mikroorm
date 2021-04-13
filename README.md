@@ -14,10 +14,10 @@ It is useful if you have several type of filterable entities in your schema and 
 Just add the `@Filter` decorator to the fields that should be filterable.
 
 ```typescript
-import * as GraphQL from "type-graphql";
+import * as GraphQL from 'type-graphql';
 import * as GraphQLFilter from '@100k/type-graphql-filter-mikroorm';
 
-@ObjectType("Category")
+@ObjectType('Category')
 export class Category {
 
     @GraphQL.Field()
@@ -30,12 +30,16 @@ export class Category {
     title: string;
     
 }
+```
+```typescript
+import * as GraphQL from 'type-graphql';
+import * as GraphQLFilter from '@100k/type-graphql-filter-mikroorm';
 
-@ObjectType("Article")
+@ObjectType('Article')
 export class Article {
 
     @GraphQL.Field()
-    @GraphQLFilter.Filter(['eq', 'ne', 'like', 'in'])
+    @GraphQLFilter.Filter(['eq', 'ne', 'in'])
     @ORM.PrimaryKey()
     id: number;
 
@@ -50,7 +54,7 @@ export class Article {
 
     @GraphQL.Field(type => GraphQLISODateTime)
     @GraphQLFilter.Filter(['gt', 'gte', 'lt', 'lte'], type => GraphQL.GraphQLISODateTime)
-    dateField: Date;
+    createdAt: Date;
     
 }
 ```
@@ -102,22 +106,32 @@ This will automatically generate the `InputType`:
 
 ```graphql
 input ArticlePagination {
-  page: Float!
-  itemsPerPage: Float!
+  page: Int!
+  itemsPerPage: Int!
 }
 
 input ArticleFilter {
-  rank: Holding_rank_Condition
-  token: Holding_token_Condition
-  balance: Holding_balance_Condition
-  share: Holding_share_Condition
-  account: AccountFilter
-  and: [HoldingFilter!]
-  or: [HoldingFilter!]
-  not: HoldingFilter
+  id: Article_id_Condition
+  category: CategoryFilter
+  title: Holding_token_Condition
+  createdAt: DateTime
+  
+  and: [ArticleFilter!]
+  or: [ArticleFilter!]
+  not: ArticleFilter
 }
 
-input Holding_rank_Condition {
+input Article_id_Condition {
+  eq: Int
+  ne: Int
+  in: [Int]
+}
+
+input Article_title_Condition {
+  like: String
+}
+
+input Article_category_Condition {
   eq: Int
   lt: Int
   lte: Int
@@ -125,30 +139,32 @@ input Holding_rank_Condition {
   gte: Int
 }
 
-input Holding_token_Condition {
-  eq: Int
+input Article_createdAt_Condition {
+  lt: DateTime
+  lte: DateTime
+  gt: DateTime
+  gte: DateTime
 }
 
-input Holding_balance_Condition {
-  eq: Int
-  lt: Int
-  lte: Int
-  gt: Int
-  gte: Int
-}
-
-input Holding_share_Condition {
-  eq: Float
-  lt: Float
-  lte: Float
-  gt: Float
-  gte: Float
-}
-
-input AccountFilter {
-  address: Account_address_Condition
+input CategoryFilter {
+  id: Category_id_Condition
+  title: Category_title_Condition
+  
   and: [AccountFilter!]
   or: [AccountFilter!]
   not: AccountFilter
+}
+
+input Category_id_Condition {
+  eq: Int
+  ne: Int
+  in: [Int]
+  nin: [Int]
+}
+
+input Category_title_Condition {
+  eq: String
+  ne: String
+  like: String
 }
 ```
