@@ -1,38 +1,51 @@
-import { FILTER_OPERATORS } from '../types';
+import { FILTER_OPERATORS, LOGICAL_OPERATORS } from '../types';
 
 
-export function parseMikroOrmFilters(source : any)
+function isPlainObject(value : any)
 {
-    const parsed : any = {};
-    for (const key in source) {
-        if (!source.hasOwnProperty(key)) {
-            continue;
-        }
+    return Object.prototype.toString.call(value) === '[object Object]';
+}
 
-        const tKey = FILTER_OPERATORS.includes(key)
-            ? '$' + key
-            : key;
+function isSmartConditionContainer(source : any)
+{
+    return !Object.keys(source)
+        .find(key => !FILTER_OPERATORS.includes(key));
+}
 
-        if (source[key] instanceof Array) {
-            parsed[tKey] = [];
-            for (const idx in source[key]) {
-                if (source[key][idx] instanceof Object) {
-                    parsed[tKey][idx] = parseMikroOrmFilters(source[key][idx]);
-                }
-                else {
-                    parsed[tKey][idx] = source[key][idx];
-                }
-            }
+export function parseMikroOrmFilters(source : any, parsePlainValue : boolean = true)
+{
+    if (source instanceof Array) {
+        const parsed : any[] = [];
+        Object.values(source)
+            .forEach((value) => {
+                parsed.push(parseMikroOrmFilters(value));
+            });
+        return parsed;
+    }
+    else if (isPlainObject(source)) {
+        if (isSmartConditionContainer(source)) {
+            const parsed : any = {};
+            Object.entries(source)
+                .forEach(([ index, value ]) => {
+                    const key = FILTER_OPERATORS.includes(index)
+                        ? '$' + index
+                        : index;
+                    parsed[key] = parseMikroOrmFilters(
+                        value,
+                        LOGICAL_OPERATORS.includes(index)
+                    );
+                });
+            return parsed;
         }
-        else if (
-            source[key] instanceof Object
-            && source[key].constructor === Object
-        ) {
-            parsed[tKey] = parseMikroOrmFilters(source[key]);
-        }
-        else {
-            parsed[tKey] = source[key];
+        else if (parsePlainValue) {
+            const parsed : any = {};
+            Object.entries(source)
+                .forEach(([ index, value ]) => {
+                    parsed[index] = parseMikroOrmFilters(value);
+                });
+            return parsed;
         }
     }
-    return parsed;
+
+    return source;
 }

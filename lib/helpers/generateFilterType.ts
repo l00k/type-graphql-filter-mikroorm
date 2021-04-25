@@ -1,7 +1,7 @@
 import * as GraphQL from 'type-graphql';
 import { getMetadataStorage as getTypeGraphQLMetadataStorage } from 'type-graphql/dist/metadata/getMetadataStorage';
 import { getMetadataStorage } from '../metadata/getMetadataStorage';
-import { ARRAY_RETURN_TYPE_OPERATORS, LOGICAL_RETURN_TYPE_OPERATORS, ReturnTypeFunc, getFilterTypeStorage } from '../types';
+import { ARRAY_OPERATORS, LOGICAL_OPERATORS, ReturnTypeFunc, getFilterTypeStorage } from '../types';
 
 
 /**
@@ -62,13 +62,13 @@ export function generateFilterType(type : Function) : ReturnTypeFunc
         );
 
         for (const operator of operators) {
-            const baseReturnType = LOGICAL_RETURN_TYPE_OPERATORS.includes(operator)
+            const baseReturnType = LOGICAL_OPERATORS.includes(operator)
                 ? typeContainer[fieldConditionTypeName]
                 : typeof getReturnType === 'function'
                     ? getReturnType()
                     : String;
 
-            const returnTypeFunction = ARRAY_RETURN_TYPE_OPERATORS.includes(operator)
+            const returnTypeFunction = ARRAY_OPERATORS.includes(operator)
                 ? () => [ baseReturnType ]
                 : () => baseReturnType;
 
@@ -90,8 +90,8 @@ export function generateFilterType(type : Function) : ReturnTypeFunc
     }
 
     // Add logical operators
-    for (const operator of LOGICAL_RETURN_TYPE_OPERATORS) {
-        const returnTypeFunction = ARRAY_RETURN_TYPE_OPERATORS.includes(operator)
+    for (const operator of LOGICAL_OPERATORS) {
+        const returnTypeFunction = ARRAY_OPERATORS.includes(operator)
             ? () => [ typeContainer[conditionTypeName] ]
             : () => typeContainer[conditionTypeName];
 
