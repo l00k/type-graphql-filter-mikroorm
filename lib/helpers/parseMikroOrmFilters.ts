@@ -24,7 +24,10 @@ export function parseMikroOrmFilters(source : any)
                 }
             }
         }
-        else if (source[key] instanceof Object) {
+        else if (
+            source[key] instanceof Object
+            && source[key].constructor === Object
+        ) {
             parsed[tKey] = parseMikroOrmFilters(source[key]);
         }
         else {
