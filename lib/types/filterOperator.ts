@@ -25,4 +25,4 @@ export const FILTER_OPERATORS : string[] = [ 'eq', 'gt', 'gte', 'in', 'lt', 'lte
 
 export const LOGICAL_OPERATORS : string[] = [ 'and', 'or', 'not' ];
 
-export const ARRAY_OPERATORS : string[] = [ 'and', 'or', 'in' ];
+export const ARRAY_OPERATORS : string[] = [ 'and', 'or', 'in', 'nin' ];
