@@ -1,7 +1,7 @@
 import 'reflect-metadata';
 import { getMetadataStorage } from '../metadata';
 import {
-    BOOLEAN_DEFAULT_FILTERS, DATE_DEFAULT_FILTERS,
+    BOOLEAN_DEFAULT_FILTERS, DATE_DEFAULT_FILTERS, DEFAULT_FILTERS,
     FilterOperator,
     NUMBER_DEFAULT_FILTERS,
     ReturnTypeFunc,
@@ -40,7 +40,7 @@ export function Filter (
                 operators = DATE_DEFAULT_FILTERS;
             }
             else {
-                operators = [];
+                operators = DEFAULT_FILTERS;
             }
         }
         else {
