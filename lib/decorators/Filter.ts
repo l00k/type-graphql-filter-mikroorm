@@ -54,6 +54,9 @@ export function Filter (
             if (Type === Number) {
                 returnTypeFunction = () => GraphQL.Float;
             }
+            else if (Type === Date) {
+                returnTypeFunction = () => GraphQL.GraphQLISODateTime;
+            }
         }
         
         metadataStorage.filters.push({
