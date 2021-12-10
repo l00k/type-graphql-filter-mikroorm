@@ -1,6 +1,6 @@
 {
   "name": "@100k/type-graphql-filter-mikroorm",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "Filter decorator for type-graphql and MikroORM",
   "main": "dist/lib/index.js",
   "types": "dist/lib/index.d.ts",
