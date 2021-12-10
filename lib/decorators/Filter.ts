@@ -1,5 +1,12 @@
+import 'reflect-metadata';
 import { getMetadataStorage } from '../metadata';
-import { FilterOperator, ReturnTypeFunc } from '../types';
+import {
+    BOOLEAN_DEFAULT_FILTERS, DATE_DEFAULT_FILTERS,
+    FilterOperator,
+    NUMBER_DEFAULT_FILTERS,
+    ReturnTypeFunc,
+    STRING_DEFAULT_FILTERS
+} from '../types';
 
 
 /**
@@ -9,25 +16,44 @@ import { FilterOperator, ReturnTypeFunc } from '../types';
  * @param operators
  * @param returnTypeFunction
  */
-export function Filter(
+export function Filter (
     operators? : FilterOperator | FilterOperator[],
     returnTypeFunction? : ReturnTypeFunc,
 ) : PropertyDecorator
 {
-    return (prototype, field : string | symbol) => {
+    return (Target, propertyName : string | symbol) => {
         const metadataStorage = getMetadataStorage();
-
-        operators = typeof operators === 'undefined'
-            ? []
-            : typeof operators === 'string'
+        
+        if (typeof operators === 'undefined') {
+            const Type = Reflect.getMetadata('design:type', Target, propertyName);
+            
+            if (Type === Boolean) {
+                operators = BOOLEAN_DEFAULT_FILTERS;
+            }
+            else if (Type === Number) {
+                operators = NUMBER_DEFAULT_FILTERS;
+            }
+            else if (Type === String) {
+                operators = STRING_DEFAULT_FILTERS;
+            }
+            else if (Type === Date) {
+                operators = DATE_DEFAULT_FILTERS;
+            }
+            else {
+                operators = [];
+            }
+        }
+        else {
+            operators = typeof operators === 'string'
                 ? [ operators ]
                 : operators;
-
+        }
+        
         metadataStorage.filters.push({
-            field,
+            field: propertyName,
             operators,
             getReturnType: returnTypeFunction,
-            target: prototype.constructor,
+            target: Target.constructor,
         });
     };
 }

@@ -12,7 +12,7 @@ function isSmartConditionContainer(source : any)
         .find(key => !FILTER_OPERATORS.includes(key));
 }
 
-export function parseMikroOrmFilters(source : any, parsePlainValue : boolean = true)
+export function parseMikroOrmFilters<T>(source : T, parsePlainValue : boolean = true): T
 {
     if (source instanceof Array) {
         const parsed : any[] = [];
@@ -20,7 +20,7 @@ export function parseMikroOrmFilters(source : any, parsePlainValue : boolean = t
             .forEach((value) => {
                 parsed.push(parseMikroOrmFilters(value));
             });
-        return parsed;
+        return <any> parsed;
     }
     else if (isPlainObject(source)) {
         if (isSmartConditionContainer(source)) {
