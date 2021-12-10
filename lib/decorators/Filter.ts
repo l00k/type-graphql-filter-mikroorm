@@ -7,6 +7,7 @@ import {
     ReturnTypeFunc,
     STRING_DEFAULT_FILTERS
 } from '../types';
+import * as GraphQL from 'type-graphql';
 
 
 /**
@@ -24,9 +25,9 @@ export function Filter (
     return (Target, propertyName : string | symbol) => {
         const metadataStorage = getMetadataStorage();
         
-        if (typeof operators === 'undefined') {
-            const Type = Reflect.getMetadata('design:type', Target, propertyName);
-            
+        const Type = Reflect.getMetadata('design:type', Target, propertyName);
+        
+        if (!operators) {
             if (Type === Boolean) {
                 operators = BOOLEAN_DEFAULT_FILTERS;
             }
@@ -47,6 +48,12 @@ export function Filter (
             operators = typeof operators === 'string'
                 ? [ operators ]
                 : operators;
+        }
+        
+        if (!returnTypeFunction) {
+            if (Type === Number) {
+                returnTypeFunction = () => GraphQL.Float;
+            }
         }
         
         metadataStorage.filters.push({
